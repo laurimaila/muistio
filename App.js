@@ -7,44 +7,57 @@ class MuistioList extends React.Component {
   state = {
     loading: true,
     error: false,
-    muistiinpanot: []
+
+    notesArray: [{
+      "note": "Note 1",
+      "id": "1"
+    },
+    {
+      "note": "Note 2",
+      "id": "2"
+    },
+    {
+      "note": "Note 3",
+      "id": "3"
+    },
+    {
+      "note": "Note 4",
+      "id": "4"
+    },
+    {
+      "note": "Note 5",
+      "id": "5"
+    },
+    {
+      "note": "Note 6",
+      "id": "6"
+    },
+    {
+      "note": "Note 7",
+      "id": "7"
+    }
+    ]
   }
 
-  componentDidMount() {
-    fetch('https://jastpa.utugit.fi/lunch-api/restaurants')
-      .then(res => res.json())
-      .then(muistiinpanot => this.setState({ loading: false, muistiinpanot: muistiinpanot }))
-      .catch(e => this.setState({ error: true, loading: false }));
-  }
+  // componentDidMount() {
+  //   fetch('https://jastpa.utugit.fi/lunch-api/restaurants')
+  //     .then(res => res.json())
+  //     .then(muistiinpanot => this.setState({ loading: false, muistiinpanot: muistiinpanot }))
+  //     .catch(e => this.setState({ error: true, loading: false }));
+  // }
 
   render() {
-    if (this.state.loading) {
-      return (
-        <View>
-          <ActivityIndicator animating={true} />
-        </View>
-      )
-    }
-
-    if (this.state.error) {
-      return (
-        <View>
-          <Text>Failed to load restaurants!</Text>
-        </View>
-      )
-    }
-
     return (
       <><ScrollView>
-        {this.state.muistiinpanot.map(restaurant => <Muistiinpano
-          key={restaurant.id}
-          name={restaurant.name}
-          id={restaurant.id}
-          navigation={this.props.navigation} />)}
+        {this.state.notesArray.map(e => <Muistiinpano
+          key={e.id}
+          note={e.note}
+        // navigation={this.props.navigation} 
+        />)}
       </ScrollView>
         <View>
           <TextInput placeholder="Kirjoita muistiinpano tähän" />
-          <Button title="Send" onPress={() => alert('No saving action implemented in this example')} />
+          <Button title="Tallenna muistiinpano" onPress={() => alert('No saving action implemented in this example')} />
         </View></>
     );
   }
@@ -52,10 +65,10 @@ class MuistioList extends React.Component {
 
 const Muistiinpano = (props) => {
   return (
-    <Button
-      title={props.name}
-      onPress={() => props.navigation.navigate('Menus', { id: props.id, name: props.name })}
-    />
+    <View>
+      <Text>{props.note}</Text>
+
+    </View>
   )
 }
 
@@ -126,11 +139,25 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Muistio">
         <Stack.Screen name="Muistio" component={MuistioList} />
-        <Stack.Screen name="Menus" component={MenuScreen} />
-        <Stack.Screen name="Admin" component={AdminScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+const inputComponent = () => {
+  const [text, setText] = React.useState("");
+
+  return (
+    <><TextInput
+      label="Kirjoita muistiinpano tähän"
+      value={text}
+      onChangeText={text => setText(text)} /><Button
+        onPress={pushArray}
+        title="Learn More"
+        color="#841584"
+        accessibilityLabel="Learn more about this purple button" /></>
+
+  );
+};
 
 export default App;
