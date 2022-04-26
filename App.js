@@ -1,163 +1,129 @@
 import * as React from 'react';
-import { Text, View, Button, ActivityIndicator, TextInput, ScrollView } from 'react-native';
+import { Text, View, Button, ActivityIndicator, Alert, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-class MuistioList extends React.Component {
-  state = {
-    loading: true,
-    error: false,
-
-    notesArray: [{
-      "note": "Note 1",
-      "id": "1"
-    },
-    {
-      "note": "Note 2",
-      "id": "2"
-    },
-    {
-      "note": "Note 3",
-      "id": "3"
-    },
-    {
-      "note": "Note 4",
-      "id": "4"
-    },
-    {
-      "note": "Note 5",
-      "id": "5"
-    },
-    {
-      "note": "Note 6",
-      "id": "6"
-    },
-    {
-      "note": "Note 7",
-      "id": "7"
-    }
-    ]
-  }
-
-  // componentDidMount() {
-  //   fetch('https://jastpa.utugit.fi/lunch-api/restaurants')
-  //     .then(res => res.json())
-  //     .then(muistiinpanot => this.setState({ loading: false, muistiinpanot: muistiinpanot }))
-  //     .catch(e => this.setState({ error: true, loading: false }));
-  // }
-
-  render() {
-    return (
-      <><ScrollView>
-        {this.state.notesArray.map(e => <Muistiinpano
-          key={e.id}
-          note={e.note}
-        // navigation={this.props.navigation} 
-        />)}
-      </ScrollView>
-        <View>
-          <TextInput placeholder="Kirjoita muistiinpano tähän" />
-          <Button title="Tallenna muistiinpano" onPress={() => alert('No saving action implemented in this example')} />
-        </View></>
-    );
-  }
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
 }
+
+const Muistio = ({ navigation }) => {
+  const [muistioState, setMuistiostate] = useState([{ "note": "Muistiinpano", "id": 1 }]);
+  const [inputText, setText] = useState("");
+
+  const onPressButton = () => {
+    if (muistioState.some(e => e.note === inputText)) {
+      showAlert()
+    } else {
+      setMuistiostate(muistioState => [...muistioState, { "note": inputText, "id": getRandomInt(5000) }]);
+      console.log("Nappia painettu!");
+    }
+  }
+
+
+
+  return (
+    <><ScrollView contentContainerStyle={{ justifyContent: 'center' }}>
+      {muistioState.map(e => <Muistiinpano
+        key={e.id}
+        note={e.note} />)}
+        <Button title="Lisää uusi muistiinpano" onPress={() => navigation.navigate('NewNote')} />
+    </ScrollView>
+      {/* <View>
+        <TextInput
+          style={styles.input}
+          onChangeText={newText => setText(newText)}
+          defaultValue={""}
+        />
+        <Button
+          color="#c60055"
+          onPress={onPressButton}
+          title="Tallenna muistiinpano"
+        />
+      </View></>  */}</>
+  );
+}
+
+const NewNote = () => {
+  return(
+  <View>
+        <TextInput
+          style={styles.input}
+          onChangeText={newText => setText(newText)}
+          defaultValue={""}
+        />
+        <Button
+          color="#c60055"
+          onPress={onPressButton}
+          title="Tallenna muistiinpano"
+        />
+      </View>
+  );   
+}
+
 
 const Muistiinpano = (props) => {
   return (
     <View>
-      <Text>{props.note}</Text>
-
+      <Text style={styles.ebin}>{props.note}</Text>
     </View>
   )
 }
 
-class MenuScreen extends React.Component {
-  state = {
-    menu: [],
-    loading: true,
-    error: false
-  }
-  componentDidMount() {
-    fetch(`https://jastpa.utugit.fi/lunch-api/restaurant/${this.props.route.params.id}`)
-      .then(res => res.json())
-      .then(menu => this.setState({ menu: menu, loading: false }))
-      .catch(e => this.setState({ error: true, loading: false }))
-  }
 
-  render() {
-    if (this.state.loading) {
-      return (
-        <View>
-          <ActivityIndicator animating={true} />
-        </View>
-      )
-    }
-    if (this.state.error) {
-      return (
-        <View>
-          <Text>Failed to load menu!</Text>
-        </View>
-      )
-    }
-    return (
-      <ScrollView>
-        {this.state.menu.map(weekday => <Weekday key={weekday.id} weekday={weekday} />)}
-      </ScrollView>
-    );
-  }
-}
 
-const Weekday = (props) => {
-  return (
-    <View>
-      <Text>{props.weekday.name}</Text>
-      {props.weekday.menuitems.map(meal => <Meal key={meal.id} meal={meal} />)}
-    </View>
-  )
-}
-
-const Meal = (props) => {
-  return (
-    <Text>{props.meal.name}</Text>
-  )
-}
-
-const AdminScreen = (props) => {
-  return (
-    <View>
-      <TextInput placeholder="Write the name of the menuitem" />
-      <Button title="Send" onPress={() => alert('No saving action implemented in this example')} />
-    </View>
+const showAlert = () => {
+  Alert.alert(
+    "Virhe",
+    "Kyseinen muistiinpano on jo lisätty!",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ],
   );
 }
+
+
 
 const Stack = createStackNavigator();
 
 const App = () => {
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Muistio">
-        <Stack.Screen name="Muistio" component={MuistioList} />
+        <Stack.Screen name="Muistio" component={Muistio} />
+        <Stack.Screen name="NewNote" component={NewNote} />
       </Stack.Navigator>
     </NavigationContainer>
   );
+
 }
 
-const inputComponent = () => {
-  const [text, setText] = React.useState("");
-
-  return (
-    <><TextInput
-      label="Kirjoita muistiinpano tähän"
-      value={text}
-      onChangeText={text => setText(text)} /><Button
-        onPress={pushArray}
-        title="Learn More"
-        color="#841584"
-        accessibilityLabel="Learn more about this purple button" /></>
-
-  );
-};
-
 export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 50,
+  },
+  ebin: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 25,
+    backgroundColor: '#ff79b0'
+  },
+  input: {
+    height: 50,
+    margin: 0,
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 20,
+    borderWidth: 2,
+    padding: 10,
+    backgroundColor: '#ff4081'
+  },
+});
