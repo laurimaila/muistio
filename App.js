@@ -98,7 +98,7 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Muistio">
         <Stack.Screen name="Muistio" component={Muistio} />
-        <Stack.Screen name="NewNote" component={NewNote} />
+        <Stack.Screen name="NewNote" component={NewNote} options={{ title: 'Uusi muistiinpano' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
