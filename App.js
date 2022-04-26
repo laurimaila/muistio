@@ -10,9 +10,9 @@ function getRandomInt(max) {
 
 const Muistio = ({ navigation }) => {
   const [muistioState, setMuistiostate] = useState([{ "note": "Muistiinpano", "id": 1 }]);
-  const [inputText, setText] = useState("");
-
+  
   const onPressButton = () => {
+    console.log("Nappia painettiin!")
     if (muistioState.some(e => e.note === inputText)) {
       showAlert()
     } else {
@@ -21,7 +21,7 @@ const Muistio = ({ navigation }) => {
     }
   }
 
-
+  <NewNote onClick={onPressButton}/> 
 
   return (
     <><ScrollView contentContainerStyle={{ justifyContent: 'center' }}>
@@ -30,6 +30,7 @@ const Muistio = ({ navigation }) => {
         note={e.note} />)}
         <Button title="Lisää uusi muistiinpano" onPress={() => navigation.navigate('NewNote')} />
     </ScrollView>
+    
       {/* <View>
         <TextInput
           style={styles.input}
@@ -45,7 +46,8 @@ const Muistio = ({ navigation }) => {
   );
 }
 
-const NewNote = () => {
+const NewNote = ({onClick}) => {
+  const [inputText, setText] = useState("");
   return(
   <View>
         <TextInput
@@ -55,7 +57,7 @@ const NewNote = () => {
         />
         <Button
           color="#c60055"
-          onPress={onPressButton}
+          //onPress={onClick}
           title="Tallenna muistiinpano"
         />
       </View>
