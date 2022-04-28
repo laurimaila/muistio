@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, Button, ActivityIndicator, Alert, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { Text, View, Button, Alert, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -8,72 +8,72 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-const Muistio = ({ navigation }) => {
+var count = 0;
+
+const Muistio = ({ navigation, route }) => {
   const [muistioState, setMuistiostate] = useState([{ "note": "Muistiinpano", "id": 1 }]);
-  
+
+  useEffect(() => {
+    if (route.params?.uusiNote) {
+      onPressButton()
+    }
+  }, [count]);
+
   const onPressButton = () => {
-    console.log("Nappia painettiin!")
-    if (muistioState.some(e => e.note === inputText)) {
+    console.log("Tallennusnappia painettu")
+    if (muistioState.some(e => e.note === route.params?.uusiNote)) {
       showAlert()
     } else {
-      setMuistiostate(muistioState => [...muistioState, { "note": inputText, "id": getRandomInt(5000) }]);
-      console.log("Nappia painettu!");
+      setMuistiostate(muistioState => [...muistioState, { "note": route.params?.uusiNote, "id": getRandomInt(5000) }]);
     }
   }
-
-  <NewNote onClick={onPressButton}/> 
 
   return (
     <><ScrollView contentContainerStyle={{ justifyContent: 'center' }}>
       {muistioState.map(e => <Muistiinpano
         key={e.id}
         note={e.note} />)}
-        <Button title="Lisää uusi muistiinpano" onPress={() => navigation.navigate('NewNote')} />
     </ScrollView>
-    
-      {/* <View>
-        <TextInput
-          style={styles.input}
-          onChangeText={newText => setText(newText)}
-          defaultValue={""}
-        />
-        <Button
-          color="#c60055"
-          onPress={onPressButton}
-          title="Tallenna muistiinpano"
-        />
-      </View></>  */}</>
+      <View>
+        <Button color="#ff4081" title="Uusi muistiinpano" fontSize="30" onPress={() => { navigation.navigate('NewNote'); count++ }} />
+      </View></>
   );
 }
 
-const NewNote = ({onClick}) => {
+const NewNote = ({ navigation, route }) => {
   const [inputText, setText] = useState("");
-  return(
-  <View>
-        <TextInput
-          style={styles.input}
-          onChangeText={newText => setText(newText)}
-          defaultValue={""}
-        />
-        <Button
-          color="#c60055"
-          //onPress={onClick}
-          title="Tallenna muistiinpano"
-        />
-      </View>
-  );   
+  return (
+    <View>
+      <TextInput
+        style={styles.input}
+        placeholder="Kirjoita tähän!"
+        placeholderTextColor="white"
+        onChangeText={newText => setText(newText)}
+        defaultValue={""}
+      />
+      <Button
+        color="#ff4081"
+        title="Tallenna muistiinpano"
+        onPress={() => {
+          count++
+          navigation.navigate({
+            name: 'Muistio',
+            params: { uusiNote: inputText },
+            merge: true,
+          });
+        }}
+      />
+    </View>
+  );
 }
-
 
 const Muistiinpano = (props) => {
   return (
     <View>
-      <Text style={styles.ebin}>{props.note}</Text>
+      <Text style={styles.muistioteksti}>{props.note}</Text>
     </View>
   )
 }
-
-
 
 const showAlert = () => {
   Alert.alert(
@@ -87,8 +87,6 @@ const showAlert = () => {
     ],
   );
 }
-
-
 
 const Stack = createStackNavigator();
 
@@ -108,23 +106,21 @@ const App = () => {
 export default App;
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 50,
-  },
-  ebin: {
+
+  muistioteksti: {
     color: 'white',
     fontWeight: 'bold',
     textAlign: 'center',
-    fontSize: 25,
-    backgroundColor: '#ff79b0'
+    fontSize: 30,
+    backgroundColor: '#ff4081',
+    margin: 5
   },
   input: {
     height: 50,
-    margin: 0,
+    margin: 5,
     textAlign: 'center',
     color: 'white',
     fontSize: 20,
-    borderWidth: 2,
     padding: 10,
     backgroundColor: '#ff4081'
   },
