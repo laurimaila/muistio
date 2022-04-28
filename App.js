@@ -8,23 +8,24 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-var count = 0;
+var laskuri = 0;
 
 const Muistio = ({ navigation, route }) => {
-  const [muistioState, setMuistiostate] = useState([{ "note": "Muistiinpano", "id": 1 }]);
+  const [muistioState, setMuistioState] = useState([{ "note": "Muistiinpano 1", "id": 1 },{ "note": "Muistiinpano 2", "id": 2 }]);
 
   useEffect(() => {
+    console.log("useEffect aktivoitu")
     if (route.params?.uusiNote) {
-      onPressButton()
+      onPressButton()    
     }
-  }, [count]);
+  }, [laskuri]);
 
   const onPressButton = () => {
-    console.log("Tallennusnappia painettu")
+    console.log("onPressButton aktivoitu")
     if (muistioState.some(e => e.note === route.params?.uusiNote)) {
       showAlert()
     } else {
-      setMuistiostate(muistioState => [...muistioState, { "note": route.params?.uusiNote, "id": getRandomInt(5000) }]);
+      setMuistioState(muistioState => [...muistioState, { "note": route.params?.uusiNote, "id": getRandomInt(5000) }]);
     }
   }
 
@@ -35,12 +36,12 @@ const Muistio = ({ navigation, route }) => {
         note={e.note} />)}
     </ScrollView>
       <View>
-        <Button color="#ff4081" title="Uusi muistiinpano" fontSize="30" onPress={() => { navigation.navigate('NewNote'); count++ }} />
+        <Button color="#ff4081" title="Uusi muistiinpano" fontSize="30" onPress={() => { navigation.navigate('NewNote') }} />
       </View></>
   );
 }
 
-const NewNote = ({ navigation, route }) => {
+const NewNote = ({ navigation }) => {
   const [inputText, setText] = useState("");
   return (
     <View>
@@ -55,7 +56,7 @@ const NewNote = ({ navigation, route }) => {
         color="#ff4081"
         title="Tallenna muistiinpano"
         onPress={() => {
-          count++
+          laskuri++; console.log("Count kasvatettu")
           navigation.navigate({
             name: 'Muistio',
             params: { uusiNote: inputText },
