@@ -3,6 +3,11 @@ import { Text, View, Button, Alert, StyleSheet, TextInput, ScrollView } from 're
 import { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const STORAGE_KEY = '@save_muistioState'
+
+
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * max);
@@ -11,21 +16,49 @@ function getRandomInt(max) {
 var laskuri = 0;
 
 const Muistio = ({ navigation, route }) => {
-  const [muistioState, setMuistioState] = useState([{ "note": "Muistiinpano 1", "id": 1 },{ "note": "Muistiinpano 2", "id": 2 }]);
+  const [muistioState, setMuistioState] = useState([{ "note": "Muistiinpano 1", "id": 1}]);
+
+  const saveData = async () => {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(muistioState))
+      alert('Data successfully saved')
+    } catch (e) {
+      alert('Failed to save the data to the storage')
+    }
+  }
+
+  
+
+  const readData = async () => {
+    try {
+      const muistiTila = await AsyncStorage.getItem(STORAGE_KEY)
+  
+      if (muistiTila !== null) {
+        muistiParsed = JSON.parse(muistiTila);
+        setMuistioState(muistiParsed)
+      }
+    } catch (e) {
+      alert('Failed to fetch the data from storage')
+    }
+  }
+
+  readData();
 
   useEffect(() => {
     console.log("useEffect aktivoitu")
     if (route.params?.uusiNote) {
-      onPressButton()    
+      onPressButton()
     }
   }, [laskuri]);
 
   const onPressButton = () => {
     console.log("onPressButton aktivoitu")
+    console.log(muistioState);
     if (muistioState.some(e => e.note === route.params?.uusiNote)) {
       showAlert()
     } else {
       setMuistioState(muistioState => [...muistioState, { "note": route.params?.uusiNote, "id": getRandomInt(5000) }]);
+      saveData();
     }
   }
 
