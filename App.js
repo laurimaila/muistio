@@ -9,39 +9,50 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-var laskuri = 0;
+var tallennuksia = 0;
 
 const Muistio = ({ navigation, route }) => {
+  // Käytin hookkeja luokan sijaan
   const [muistioState, setMuistioState] = useState([]);
 
-
-  
+  // Muistiinpanojen haku kun sovellus käynnistyy
   useEffect(() => {
-    //console.log("useEffect aktivoitu")
+    function fetchNotes() {
+      AsyncStorage.getItem('muistio').then(note => {
+        let parsedNote = JSON.parse(note);
+        setMuistioState(parsedNote);
+      });
+    }
+    fetchNotes();
+  }, []);
+
+  // Uuden muistiinpanon lisäys tai virhe kun tallennusta painetaan
+  useEffect(() => {
     if (route.params?.uusiNote) {
       onPressButton()
     }
-  }, [laskuri]
+  }, [tallennuksia]
   );
 
+  // AsyncStoragen päivitys kun muistiinpanojen State muuttuu
   useEffect(() => {
     AsyncStorage.setItem('muistio', JSON.stringify(muistioState))
   }, [muistioState]
   );
 
+  // Tallennusnapin funktionaalisuus
   const onPressButton = () => {
-    console.log("onPressButton aktivoitu")
-    getAsync();
 
     if (muistioState.some(e => e.note === route.params?.uusiNote)) {
+      // Varoitus identtisestä muistiinpanosta
       showAlert()
     } else {
       setMuistioState(muistioState => [...muistioState, { "note": route.params?.uusiNote, "id": getRandomInt(5000) }]);
     }
-
   }
 
   return (
+    // Muistiinpanot ScrollViewiin
     <><ScrollView contentContainerStyle={{ justifyContent: 'center' }}>
       {muistioState.map(e => <Muistiinpano
         key={e.id}
@@ -53,6 +64,7 @@ const Muistio = ({ navigation, route }) => {
   );
 }
 
+// Uuden muistiinpanot tekemisen komponentti
 const NewNote = ({ navigation }) => {
   const [inputText, setText] = useState("");
   return (
@@ -68,7 +80,8 @@ const NewNote = ({ navigation }) => {
         color="#ff4081"
         title="Tallenna muistiinpano"
         onPress={() => {
-          laskuri++;
+          tallennuksia++;
+          // Kirjoitettu teksti toiselle screenille navigaatioparametrinä
           navigation.navigate({
             name: 'Muistio',
             params: { uusiNote: inputText },
@@ -104,7 +117,7 @@ const showAlert = () => {
 const Stack = createStackNavigator();
 
 const App = () => {
-
+  // Erillinen Screen uusien muistiinpanojen lisäämiseen
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Muistio">
@@ -113,7 +126,6 @@ const App = () => {
       </Stack.Navigator>
     </NavigationContainer>
   );
-
 }
 
 export default App;
